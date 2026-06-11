@@ -56,6 +56,7 @@ button:disabled {
 .login-page {
   display: grid;
   min-height: 100vh;
+  align-items: center;
   grid-template-columns: minmax(360px, 0.95fr) minmax(360px, 1.05fr);
   background: var(--slate-50);
 }
@@ -63,9 +64,9 @@ button:disabled {
 .login-visual {
   display: grid;
   min-height: 100%;
-  align-content: space-between;
-  gap: 36px;
-  padding: 48px;
+  align-content: start;
+  gap: 28px;
+  padding: 40px 48px;
   color: var(--white);
   background:
     linear-gradient(135deg, rgba(7, 21, 46, 0.92), rgba(18, 48, 93, 0.9)),
@@ -132,6 +133,12 @@ button:disabled {
   display: block;
   width: 100%;
   height: auto;
+  max-height: 240px;
+}
+
+.graphic-topline strong {
+  font-size: 16px;
+  opacity: 0.92;
 }
 
 .graphic-window {
@@ -210,12 +217,36 @@ button:disabled {
 .login-card {
   display: grid;
   width: min(100%, 430px);
-  gap: 20px;
+  gap: 18px;
   border: 1px solid var(--slate-200);
   border-radius: var(--radius);
   padding: 32px;
   background: var(--white);
   box-shadow: var(--shadow);
+}
+
+.login-card .ghost-button {
+  border: 1px solid var(--slate-300);
+}
+
+.login-card .ghost-button:hover {
+  border-color: var(--blue-600);
+  color: var(--blue-600);
+}
+
+.login-panel {
+  display: grid;
+  place-items: center;
+  padding: 32px;
+  gap: 24px;
+}
+
+.login-card p {
+  max-width: 380px;
+}
+
+.login-card h1 {
+  font-size: 28px;
 }
 
 .login-card h1,
@@ -262,6 +293,65 @@ textarea {
   color: var(--navy-950);
   background: var(--white);
   outline: none;
+}
+
+.password-field {
+  display: grid;
+  gap: 8px;
+  color: var(--slate-700);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  padding-right: 46px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--slate-300);
+  border-radius: 999px;
+  background: var(--white);
+  color: var(--slate-500);
+}
+
+.password-toggle:hover,
+.password-toggle:focus {
+  border-color: var(--blue-600);
+  color: var(--blue-600);
+}
+
+.toast-notification {
+  width: min(100%, 430px);
+  border: 1px solid rgba(37, 99, 235, 0.22);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  background: rgba(59, 130, 246, 0.08);
+  color: var(--navy-950);
+  font-weight: 700;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+  align-self: start;
+}
+
+.auth-footer {
+  display: grid;
+  gap: 10px;
+}
+
+.auth-footer button {
+  min-height: 44px;
 }
 
 textarea {

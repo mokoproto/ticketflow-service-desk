@@ -1,16 +1,83 @@
-import { useState, type FormEvent } from "react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
 
 interface LoginScreenProps {
   onLogin: (userName: string) => void;
 }
 
+interface PasswordFieldProps {
+  label: string;
+  value: string;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  isVisible: boolean;
+  onToggle: () => void;
+  autoComplete: string;
+}
+
+function PasswordField({ label, value, onChange, isVisible, onToggle, autoComplete }: PasswordFieldProps) {
+  return (
+    <label className="password-field">
+      {label}
+      <div className="password-wrapper">
+        <input
+          autoComplete={autoComplete}
+          onChange={onChange}
+          type={isVisible ? "text" : "password"}
+          value={value}
+        />
+        <button
+          type="button"
+          className="password-toggle"
+          onClick={onToggle}
+          aria-pressed={isVisible}
+          aria-label={isVisible ? "Скрий паролата" : "Покажи паролата"}
+        >
+          {isVisible ? "👁️" : "👁"}
+        </button>
+      </div>
+    </label>
+  );
+}
+
 export function LoginScreen({ onLogin }: LoginScreenProps) {
   const [userName, setUserName] = useState("admin");
   const [password, setPassword] = useState("admin123");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showResetForm, setShowResetForm] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetNewPassword, setResetNewPassword] = useState("");
+  const [resetConfirmPassword, setResetConfirmPassword] = useState("");
+  const [showResetNewPassword, setShowResetNewPassword] = useState(false);
+  const [showResetConfirmPassword, setShowResetConfirmPassword] = useState(false);
+  const [notification, setNotification] = useState("");
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     onLogin(userName.trim() || "admin");
+  }
+
+  function handleResetSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!resetEmail || !resetNewPassword || !resetConfirmPassword) {
+      setNotification("Моля, попълнете всички полета.");
+      return;
+    }
+
+    if (resetNewPassword !== resetConfirmPassword) {
+      setNotification("Нова парола и потвърждение трябва да съвпадат.");
+      return;
+    }
+
+    setNotification(`Заявката за потвърждение за смяна на паролата е изпратена на ${resetEmail}.`);
+    setResetEmail("");
+    setResetNewPassword("");
+    setResetConfirmPassword("");
+    setShowResetNewPassword(false);
+    setShowResetConfirmPassword(false);
+
+    window.setTimeout(() => {
+      setNotification("");
+    }, 30000);
   }
 
   return (
@@ -57,56 +124,102 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
             <rect className="graphic-small-line dark" x="406" y="104" width="74" height="10" rx="5" />
             <rect className="graphic-small-line dark" x="406" y="128" width="46" height="10" rx="5" />
           </svg>
-
-          <div className="login-kpi-grid">
-            <div>
-              <span>Активни</span>
-              <strong>18</strong>
-            </div>
-            <div>
-              <span>SLA</span>
-              <strong>96%</strong>
-            </div>
-            <div>
-              <span>Решени</span>
-              <strong>42</strong>
-            </div>
-          </div>
         </div>
       </section>
 
       <section className="login-panel">
-        <form className="login-card" onSubmit={handleSubmit}>
-          <div>
-            <span className="eyebrow">Вътрешен достъп</span>
-            <h1>Вход в системата</h1>
-            <p>Управлявайте заявки, задачи и вътрешна комуникация от един централизиран работен панел.</p>
+        {notification ? (
+          <div className="toast-notification" role="status" aria-live="polite">
+            {notification}
           </div>
+        ) : null}
 
-          <label>
-            Потребителско име
-            <input
-              autoComplete="username"
-              onChange={(event) => setUserName(event.target.value)}
-              type="text"
-              value={userName}
-            />
-          </label>
+        {!showResetForm ? (
+          <form className="login-card" onSubmit={handleSubmit}>
+            <div>
+              <span className="eyebrow">Вътрешен достъп</span>
+              <h1>Вход в системата</h1>
+              <p>Управлявайте заявки, задачи и вътрешна комуникация от един централизиран работен панел.</p>
+            </div>
 
-          <label>
-            Парола
-            <input
+            <label>
+              Потребителско име
+              <input
+                autoComplete="username"
+                onChange={(event) => setUserName(event.target.value)}
+                type="text"
+                value={userName}
+              />
+            </label>
+
+            <PasswordField
+              label="Парола"
               autoComplete="current-password"
-              onChange={(event) => setPassword(event.target.value)}
-              type="password"
               value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              isVisible={showPassword}
+              onToggle={() => setShowPassword((visible) => !visible)}
             />
-          </label>
 
-          <button className="primary-button full-width" type="submit">
-            Вход
-          </button>
-        </form>
+            <button className="primary-button full-width" type="submit">
+              Вход
+            </button>
+            <button
+              type="button"
+              className="ghost-button full-width"
+              onClick={() => setShowResetForm(true)}
+            >
+              Забравена парола
+            </button>
+          </form>
+        ) : (
+          <form className="login-card" onSubmit={handleResetSubmit}>
+            <div>
+              <span className="eyebrow">Смяна на парола</span>
+              <h1>Нова парола</h1>
+              <p>Попълнете имейл и изберете нова парола.</p>
+            </div>
+
+            <label>
+              Имейл
+              <input
+                autoComplete="email"
+                onChange={(event) => setResetEmail(event.target.value)}
+                type="email"
+                value={resetEmail}
+              />
+            </label>
+
+            <PasswordField
+              label="Нова парола"
+              autoComplete="new-password"
+              value={resetNewPassword}
+              onChange={(event) => setResetNewPassword(event.target.value)}
+              isVisible={showResetNewPassword}
+              onToggle={() => setShowResetNewPassword((visible) => !visible)}
+            />
+
+            <PasswordField
+              label="Потвърди парола"
+              autoComplete="new-password"
+              value={resetConfirmPassword}
+              onChange={(event) => setResetConfirmPassword(event.target.value)}
+              isVisible={showResetConfirmPassword}
+              onToggle={() => setShowResetConfirmPassword((visible) => !visible)}
+            />
+
+            <button className="primary-button full-width" type="submit">
+              Изпрати заявка
+            </button>
+            <button
+              type="button"
+              className="ghost-button full-width"
+              onClick={() => setShowResetForm(false)}
+            >
+              Връщане към вход
+            </button>
+          </form>
+        )}
       </section>
     </main>
   );
